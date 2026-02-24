@@ -18,9 +18,9 @@ final class SelectionOverlayView: NSView {
   override func draw(_ dirtyRect: NSRect) {
     super.draw(dirtyRect)
 
-    // Dim background slightly.
-    NSColor.black.withAlphaComponent(0.15).setFill()
-    dirtyRect.fill()
+    // Dim background slightly (fill full bounds for consistency).
+    NSColor.black.withAlphaComponent(0.18).setFill()
+    bounds.fill()
 
     guard let selectionRect = selectionRectInViewCoordinates() else { return }
 

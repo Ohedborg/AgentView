@@ -6,14 +6,17 @@ final class SelectionOverlayCoordinator: NSObject {
   private var window: SelectionOverlayWindow?
   private var keyMonitor: Any?
   private var completion: ((CGRect?) -> Void)?
+  private var didPushCursor: Bool = false
 
   func beginSelection(completion: @escaping (CGRect?) -> Void) {
     guard !isActive else { return }
     isActive = true
     self.completion = completion
 
-    let unionFrame = NSScreen.screens.reduce(CGRect.zero) { $0.union($1.frame) }
-    let overlayWindow = SelectionOverlayWindow(frame: unionFrame)
+    let mouse = NSEvent.mouseLocation
+    let screen = NSScreen.screens.first(where: { $0.frame.contains(mouse) }) ?? NSScreen.main
+    let frame = screen?.frame ?? NSScreen.screens.first?.frame ?? .zero
+    let overlayWindow = SelectionOverlayWindow(frame: frame)
     self.window = overlayWindow
 
     overlayWindow.onCancel = { [weak self] in self?.finish(rect: nil) }
@@ -29,6 +32,10 @@ final class SelectionOverlayCoordinator: NSObject {
       return event
     }
 
+    // Make selection feel explicit.
+    NSCursor.crosshair.push()
+    didPushCursor = true
+
     NSApp.activate(ignoringOtherApps: true)
     overlayWindow.makeKeyAndOrderFront(nil)
   }
@@ -37,6 +44,11 @@ final class SelectionOverlayCoordinator: NSObject {
     if let keyMonitor {
       NSEvent.removeMonitor(keyMonitor)
       self.keyMonitor = nil
+    }
+
+    if didPushCursor {
+      NSCursor.pop()
+      didPushCursor = false
     }
 
     window?.orderOut(nil)

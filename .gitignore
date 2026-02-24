@@ -1,0 +1,12 @@
+## macOS
+.DS_Store
+
+## Xcode user-specific
+xcuserdata/
+*.xcuserdatad/
+
+## Xcode / build artifacts
+DerivedData/
+*.xcscmblueprint
+*.xccheckout
+
