@@ -7,7 +7,8 @@ final class SelectionOverlayWindow: NSWindow {
   private let overlayView: SelectionOverlayView
 
   init(frame: CGRect) {
-    overlayView = SelectionOverlayView(frame: frame)
+    // The window is placed in global screen coordinates; the view must be local to the window (origin 0,0).
+    overlayView = SelectionOverlayView(frame: CGRect(origin: .zero, size: frame.size))
 
     super.init(
       contentRect: frame,
@@ -19,9 +20,11 @@ final class SelectionOverlayWindow: NSWindow {
     isOpaque = false
     backgroundColor = NSColor.clear
     level = .screenSaver
-    collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+    // Show on the active Space/desktop where the user is.
+    collectionBehavior = [.moveToActiveSpace, .transient, .ignoresCycle, .fullScreenAuxiliary]
     ignoresMouseEvents = false
     hasShadow = false
+    isReleasedWhenClosed = false
 
     contentView = overlayView
 

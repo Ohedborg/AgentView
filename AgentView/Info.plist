@@ -25,6 +25,9 @@
 
   <key>NSScreenCaptureUsageDescription</key>
   <string>AgentView captures only the screen region you explicitly select so it can send that capture to your configured AI provider.</string>
+
+  <key>NSMicrophoneUsageDescription</key>
+  <string>AgentView records voice notes you choose to send to your AI provider for transcription and context.</string>
 </dict>
 </plist>
 

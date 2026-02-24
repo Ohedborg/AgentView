@@ -7,6 +7,11 @@ final class OpenAIClient {
     var description: String { message }
   }
 
+  struct StreamingResult: Equatable {
+    let text: String
+    let responseId: String?
+  }
+
   private static let logger = Logger(subsystem: "AgentView", category: "OpenAIClient")
   private let maxAttempts = 2
   private let apiKey: String
@@ -21,6 +26,66 @@ final class OpenAIClient {
 #if DEBUG
     Self.logger.debug("\(message, privacy: .public)")
 #endif
+  }
+
+  func transcribeAudio(fileURL: URL) async throws -> String {
+    guard let url = URL(string: "https://api.openai.com/v1/audio/transcriptions") else {
+      throw OpenAIError(message: "Invalid OpenAI URL")
+    }
+    guard url.scheme == "https" else {
+      throw OpenAIError(message: "Only HTTPS endpoints are allowed.")
+    }
+
+    let audioData = try Data(contentsOf: fileURL)
+    if audioData.isEmpty { throw OpenAIError(message: "Voice note audio is empty.") }
+
+    let boundary = "Boundary-\(UUID().uuidString)"
+    var body = Data()
+
+    func addField(name: String, value: String) {
+      body.appendString("--\(boundary)\r\n")
+      body.appendString("Content-Disposition: form-data; name=\"\(name)\"\r\n\r\n")
+      body.appendString("\(value)\r\n")
+    }
+
+    addField(name: "model", value: "gpt-4o-mini-transcribe")
+    addField(name: "response_format", value: "json")
+
+    body.appendString("--\(boundary)\r\n")
+    body.appendString("Content-Disposition: form-data; name=\"file\"; filename=\"voice.m4a\"\r\n")
+    body.appendString("Content-Type: audio/m4a\r\n\r\n")
+    body.append(audioData)
+    body.appendString("\r\n")
+    body.appendString("--\(boundary)--\r\n")
+
+    var req = URLRequest(url: url)
+    req.httpMethod = "POST"
+    req.timeoutInterval = 120
+    req.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+    req.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+    req.httpBody = body
+
+    let (data, response) = try await session.data(for: req)
+    if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+      let serverMessage = (try? Self.extractErrorMessage(from: data)) ?? "HTTP \(http.statusCode)"
+      throw OpenAIError(message: serverMessage)
+    }
+
+    let obj = try JSONSerialization.jsonObject(with: data, options: [])
+    if let dict = obj as? [String: Any] {
+      if let text = dict["text"] as? String {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty { return trimmed }
+      }
+    }
+
+    // Some formats can return plain text; try to decode it as UTF-8.
+    if let raw = String(data: data, encoding: .utf8) {
+      let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+      if !trimmed.isEmpty { return trimmed }
+    }
+
+    throw OpenAIError(message: "Could not parse transcription response.")
   }
 
   /// Sends the screenshot (PNG) + optional user context to OpenAI using the Responses API.
@@ -88,12 +153,13 @@ If the user provided context, use it. If not, infer cautiously.
 
   /// Streams the model output incrementally.
   /// Calls `onDelta` on the main actor for each text delta received.
-  func describeStreaming(
-    imagePNG: Data,
-    userContext: String,
+  func captureThreadStreaming(
+    imagePNG: Data?,
+    userText: String,
+    previousResponseId: String?,
     onDelta: @escaping @MainActor (String) -> Void,
     onDebug: (@MainActor (String) -> Void)? = nil
-  ) async throws -> String {
+  ) async throws -> StreamingResult {
     guard let url = URL(string: "https://api.openai.com/v1/responses") else {
       throw OpenAIError(message: "Invalid OpenAI URL")
     }
@@ -101,28 +167,46 @@ If the user provided context, use it. If not, infer cautiously.
       throw OpenAIError(message: "Only HTTPS endpoints are allowed.")
     }
 
-    debugLog("Starting streaming request (model=gpt-4.1-mini, imageBytes=\(imagePNG.count), contextChars=\(userContext.count))")
-    await onDebug?("Starting request (imageBytes=\(imagePNG.count), contextChars=\(userContext.count))")
-    let dataURL = "data:image/png;base64," + imagePNG.base64EncodedString()
     let prompt = """
 You are given a screenshot of a region the user selected.
 Return a concise, helpful description of what’s in the image and any actionable insights.
 If the user provided context, use it. If not, infer cautiously.
 """
 
-    let body: [String: Any] = [
+    var body: [String: Any] = [
       "model": "gpt-4.1-mini",
       "stream": true,
-      "input": [
+    ]
+
+    if let previousResponseId, !previousResponseId.isEmpty {
+      body["previous_response_id"] = previousResponseId
+    }
+
+    if let imagePNG {
+      debugLog("Starting capture thread (model=gpt-4.1-mini, imageBytes=\(imagePNG.count), userChars=\(userText.count), previous=\(previousResponseId ?? "<nil>"))")
+      await onDebug?("Starting request (imageBytes=\(imagePNG.count), userChars=\(userText.count), previous=\(previousResponseId ?? "<nil>"))")
+
+      let dataURL = "data:image/png;base64," + imagePNG.base64EncodedString()
+      let text = prompt + (userText.isEmpty ? "" : "\n\nUser context:\n\(userText)")
+      body["input"] = [
         [
           "role": "user",
           "content": [
-            ["type": "input_text", "text": prompt + (userContext.isEmpty ? "" : "\n\nUser context:\n\(userContext)")],
+            ["type": "input_text", "text": text],
             ["type": "input_image", "image_url": dataURL]
           ]
         ]
       ]
-    ]
+    } else {
+      debugLog("Starting follow-up thread (model=gpt-4.1-mini, userChars=\(userText.count), previous=\(previousResponseId ?? "<nil>"))")
+      await onDebug?("Starting follow-up (userChars=\(userText.count), previous=\(previousResponseId ?? "<nil>"))")
+      body["input"] = [
+        [
+          "role": "user",
+          "content": userText
+        ]
+      ]
+    }
 
     var req = URLRequest(url: url)
     req.httpMethod = "POST"
@@ -159,6 +243,7 @@ If the user provided context, use it. If not, infer cautiously.
         var deltas = 0
         var sawAnyEvent = false
         var lastEventJSON: Data?
+        var responseId: String?
         var rawLogged = 0
         let start = Date()
         for try await line in bytes.lines {
@@ -174,6 +259,7 @@ If the user provided context, use it. If not, infer cautiously.
               deltas: &deltas,
               sawAnyEvent: &sawAnyEvent,
               lastEventJSON: &lastEventJSON,
+              responseId: &responseId,
               rawLogged: &rawLogged,
               onDelta: onDelta,
               onDebug: onDebug
@@ -192,6 +278,7 @@ If the user provided context, use it. If not, infer cautiously.
                 deltas: &deltas,
                 sawAnyEvent: &sawAnyEvent,
                 lastEventJSON: &lastEventJSON,
+                responseId: &responseId,
                 rawLogged: &rawLogged,
                 onDelta: onDelta,
                 onDebug: onDebug
@@ -212,7 +299,8 @@ If the user provided context, use it. If not, infer cautiously.
             let cleaned = outputText.trimmingCharacters(in: .whitespacesAndNewlines)
             if !cleaned.isEmpty {
               await onDebug?("Recovered output_text from final event (chars=\(cleaned.count)).")
-              return cleaned
+              let rid = responseId ?? Self.extractResponseId(from: lastEventJSON)
+              return .init(text: cleaned, responseId: rid)
             }
           }
 
@@ -224,7 +312,8 @@ If the user provided context, use it. If not, infer cautiously.
         let ms = Int(Date().timeIntervalSince(start) * 1000)
         debugLog("Completed stream (deltas=\(deltas), totalChars=\(trimmed.count), timeMs=\(ms))")
         await onDebug?("Completed (deltas=\(deltas), totalChars=\(trimmed.count), timeMs=\(ms))")
-        return trimmed
+        let rid = responseId ?? (lastEventJSON.flatMap(Self.extractResponseId(from:)))
+        return .init(text: trimmed, responseId: rid)
       } catch {
         lastError = error
         guard attempt < maxAttempts, Self.isRetryable(error) else { break }
@@ -236,12 +325,29 @@ If the user provided context, use it. If not, infer cautiously.
     throw lastError ?? OpenAIError(message: "OpenAI streaming request failed.")
   }
 
+  func describeStreaming(
+    imagePNG: Data,
+    userContext: String,
+    onDelta: @escaping @MainActor (String) -> Void,
+    onDebug: (@MainActor (String) -> Void)? = nil
+  ) async throws -> String {
+    let result = try await captureThreadStreaming(
+      imagePNG: imagePNG,
+      userText: userContext,
+      previousResponseId: nil,
+      onDelta: onDelta,
+      onDebug: onDebug
+    )
+    return result.text
+  }
+
   private static func processSSEPayload(
     _ payload: String,
     full: inout String,
     deltas: inout Int,
     sawAnyEvent: inout Bool,
     lastEventJSON: inout Data?,
+    responseId: inout String?,
     rawLogged: inout Int,
     onDelta: @escaping @MainActor (String) -> Void,
     onDebug: (@MainActor (String) -> Void)?
@@ -259,6 +365,9 @@ If the user provided context, use it. If not, infer cautiously.
 
     guard let jsonData = trimmed.data(using: .utf8) else { return }
     lastEventJSON = jsonData
+    if responseId == nil {
+      responseId = Self.extractResponseId(from: jsonData)
+    }
 
     // Try delta extraction first (best UX).
     if let delta = try? Self.extractDeltaText(from: jsonData), !delta.isEmpty {
@@ -278,6 +387,29 @@ If the user provided context, use it. If not, infer cautiously.
         full += output
       }
     }
+  }
+
+  private static func extractResponseId(from data: Data) -> String? {
+    guard let obj = try? JSONSerialization.jsonObject(with: data, options: []),
+          let dict = obj as? [String: Any] else {
+      return nil
+    }
+
+    if let response = dict["response"] as? [String: Any],
+       let id = response["id"] as? String,
+       id.hasPrefix("resp_") {
+      return id
+    }
+
+    if let id = dict["id"] as? String, id.hasPrefix("resp_") {
+      return id
+    }
+
+    if let id = dict["response_id"] as? String, id.hasPrefix("resp_") {
+      return id
+    }
+
+    return nil
   }
 
   private static func extractErrorMessage(from data: Data) throws -> String {
@@ -401,6 +533,14 @@ private extension URLSession {
     config.waitsForConnectivity = true
     return URLSession(configuration: config)
   }()
+}
+
+private extension Data {
+  mutating func appendString(_ string: String) {
+    if let data = string.data(using: .utf8) {
+      append(data)
+    }
+  }
 }
 
 

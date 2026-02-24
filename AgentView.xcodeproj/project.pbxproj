@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0774D83A2F0FFA2D000E19A0 /* ResultPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0774D8312F0FFA2D000E19A0 /* ResultPresenter.swift */; };
-		0F9A1C1A2B3C4D5E6F708193 /* ResultWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F9A1C1A2B3C4D5E6F708192 /* ResultWindowController.swift */; };
 		0774D83B2F0FFA2D000E19A0 /* SelectionOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0774D8342F0FFA2D000E19A0 /* SelectionOverlayView.swift */; };
 		0774D83C2F0FFA2D000E19A0 /* HotKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0774D82E2F0FFA2D000E19A0 /* HotKeyManager.swift */; };
 		0774D83D2F0FFA2D000E19A0 /* AgentViewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0774D82F2F0FFA2D000E19A0 /* AgentViewApp.swift */; };
@@ -19,8 +18,12 @@
 		0774D8422F0FFA2D000E19A0 /* OpenAIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0774D8302F0FFA2D000E19A0 /* OpenAIClient.swift */; };
 		0774D8432F0FFA2D000E19A0 /* SelectionOverlayCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0774D8332F0FFA2D000E19A0 /* SelectionOverlayCoordinator.swift */; };
 		0774D8442F0FFA2D000E19A0 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0774D8382F0FFA2D000E19A0 /* README.md */; };
-		B1A2B3C4D5E6F70011223344 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B1A2B3C4D5E6F70011223343 /* PrivacyInfo.xcprivacy */; };
+		0F9A1C1A2B3C4D5E6F708193 /* ResultWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F9A1C1A2B3C4D5E6F708192 /* ResultWindowController.swift */; };
 		A1A1A1A1A1A1A1A1A1A1A1A2 /* AgentView/Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1A1A1A1A1A1A1A1A1A1A1A1 /* AgentView/Assets.xcassets */; };
+		B1A2B3C4D5E6F70011223344 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B1A2B3C4D5E6F70011223343 /* PrivacyInfo.xcprivacy */; };
+		F0C0B0012F2A0001000ABCDE /* AgentView/Sources/QuickChatPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0C0B0002F2A0001000ABCDE /* AgentView/Sources/QuickChatPanelController.swift */; };
+		F0C0B0032F2A0001000ABCDE /* AgentView/Sources/HotKeyRecorderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0C0B0022F2A0001000ABCDE /* AgentView/Sources/HotKeyRecorderPanel.swift */; };
+		F0C0B0052F2A0001000ABCDE /* AgentView/Sources/ThreadBrowserWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0C0B0042F2A0001000ABCDE /* AgentView/Sources/ThreadBrowserWindowController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,15 +53,18 @@
 		0774D82F2F0FFA2D000E19A0 /* AgentViewApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentViewApp.swift; sourceTree = "<group>"; };
 		0774D8302F0FFA2D000E19A0 /* OpenAIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIClient.swift; sourceTree = "<group>"; };
 		0774D8312F0FFA2D000E19A0 /* ResultPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultPresenter.swift; sourceTree = "<group>"; };
-		0F9A1C1A2B3C4D5E6F708192 /* ResultWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultWindowController.swift; sourceTree = "<group>"; };
 		0774D8322F0FFA2D000E19A0 /* Screenshotter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screenshotter.swift; sourceTree = "<group>"; };
 		0774D8332F0FFA2D000E19A0 /* SelectionOverlayCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionOverlayCoordinator.swift; sourceTree = "<group>"; };
 		0774D8342F0FFA2D000E19A0 /* SelectionOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionOverlayView.swift; sourceTree = "<group>"; };
 		0774D8352F0FFA2D000E19A0 /* SelectionOverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionOverlayWindow.swift; sourceTree = "<group>"; };
 		0774D8372F0FFA2D000E19A0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0774D8382F0FFA2D000E19A0 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		B1A2B3C4D5E6F70011223343 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		0F9A1C1A2B3C4D5E6F708192 /* ResultWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultWindowController.swift; sourceTree = "<group>"; };
 		A1A1A1A1A1A1A1A1A1A1A1A1 /* AgentView/Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AgentView/Assets.xcassets; sourceTree = "<group>"; };
+		B1A2B3C4D5E6F70011223343 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		F0C0B0002F2A0001000ABCDE /* AgentView/Sources/QuickChatPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentView/Sources/QuickChatPanelController.swift; sourceTree = "<group>"; };
+		F0C0B0022F2A0001000ABCDE /* AgentView/Sources/HotKeyRecorderPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentView/Sources/HotKeyRecorderPanel.swift; sourceTree = "<group>"; };
+		F0C0B0042F2A0001000ABCDE /* AgentView/Sources/ThreadBrowserWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentView/Sources/ThreadBrowserWindowController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -108,6 +114,9 @@
 			isa = PBXGroup;
 			children = (
 				A1A1A1A1A1A1A1A1A1A1A1A1 /* AgentView/Assets.xcassets */,
+				F0C0B0022F2A0001000ABCDE /* AgentView/Sources/HotKeyRecorderPanel.swift */,
+				F0C0B0002F2A0001000ABCDE /* AgentView/Sources/QuickChatPanelController.swift */,
+				F0C0B0042F2A0001000ABCDE /* AgentView/Sources/ThreadBrowserWindowController.swift */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -160,7 +169,7 @@
 				0774D8382F0FFA2D000E19A0 /* README.md */,
 				B1A2B3C4D5E6F70011223343 /* PrivacyInfo.xcprivacy */,
 			);
-			path = "AgentView";
+			path = AgentView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -311,6 +320,9 @@
 				0F9A1C1A2B3C4D5E6F708193 /* ResultWindowController.swift in Sources */,
 				0774D83B2F0FFA2D000E19A0 /* SelectionOverlayView.swift in Sources */,
 				0774D83C2F0FFA2D000E19A0 /* HotKeyManager.swift in Sources */,
+				F0C0B0032F2A0001000ABCDE /* AgentView/Sources/HotKeyRecorderPanel.swift in Sources */,
+				F0C0B0012F2A0001000ABCDE /* AgentView/Sources/QuickChatPanelController.swift in Sources */,
+				F0C0B0052F2A0001000ABCDE /* AgentView/Sources/ThreadBrowserWindowController.swift in Sources */,
 				0774D83D2F0FFA2D000E19A0 /* AgentViewApp.swift in Sources */,
 				0774D83E2F0FFA2D000E19A0 /* AppDelegate.swift in Sources */,
 				0774D83F2F0FFA2D000E19A0 /* ContextPromptWindowController.swift in Sources */,
@@ -480,9 +492,9 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "AgentView/Info.plist";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_FILE = AgentView/Info.plist;
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSScreenCaptureUsageDescription = "AgentView captures only the screen region you explicitly select so it can send that capture to your configured AI provider.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -508,9 +520,9 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "AgentView/Info.plist";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_FILE = AgentView/Info.plist;
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSScreenCaptureUsageDescription = "AgentView captures only the screen region you explicitly select so it can send that capture to your configured AI provider.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
