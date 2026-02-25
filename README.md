@@ -1,5 +1,5 @@
 ## AgentView
-<img width="600" height="600" alt="ChatGPT Image Feb 24, 2026, 04_06_52 PM" src="https://github.com/user-attachments/assets/8fce158c-0411-48a5-bce6-4ecaa002aede" />
+<img width="300" height="300" alt="ChatGPT Image Feb 24, 2026, 04_06_52 PM" src="https://github.com/user-attachments/assets/8fce158c-0411-48a5-bce6-4ecaa002aede" />
 
 
 A macOS **menu bar** app for “grab → chat” workflows.
