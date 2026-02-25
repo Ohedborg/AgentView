@@ -1,4 +1,6 @@
 ## AgentView
+<img width="1024" height="1024" alt="ChatGPT Image Feb 24, 2026, 04_06_52 PM" src="https://github.com/user-attachments/assets/8fce158c-0411-48a5-bce6-4ecaa002aede" />
+
 
 A macOS **menu bar** app for “grab → chat” workflows.
 
@@ -48,8 +50,14 @@ From the menu bar:
 Defaults may vary if macOS shortcuts collide, but the app ships with:
 
 - **Grab**: `⌘G`
+
+<img width="1736" height="880" alt="image" src="https://github.com/user-attachments/assets/ace8107d-43e1-40cb-9a2d-ee8039ba9a00" />
+
+
 - **Quick chat**: `⌘⇧G`
-- **Threads**: `⌘⇧T`
+
+<img width="1736" height="880" alt="image" src="https://github.com/user-attachments/assets/d192a043-f6bf-4ed3-8669-12d7a62cc622" />
+
 
 Rebind via menu bar → **Hotkeys** → “Set … hotkey…”.
 
